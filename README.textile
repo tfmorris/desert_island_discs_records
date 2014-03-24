@@ -1,0 +1,16 @@
+List of all picks from BBC radio's Desert Island Discs show 1942-present.
+
+Record types include:
+* url - link to BBC web page for the show
+* alternate_name - name on show page if it differs from index page
+* occupation - whatever was listed as a tag line for the guest, typically their occupation or what they're known for 
+* record - one of the 9 songs/tracks they selected to bring with them
+* record_keep - their favorite song/track
+* book - the book they chose to bring with them (only for more recent shows)
+* luxury - luxury item they selected to bring with them (only for more recent shows)
+
+Most of the column names should be self explanatory.  
+* MB_ID is the MusicBrainz ID for the composer or artist.
+* "principal" tells whether they main heading for the item, as specified by the BBC was the composer or performer (it varies).  The MusicBrainz ID also goes with this person.
+
+Based on (and replaces) a pair of scrapers: "Francis Irving / Desert Island Disc broadcasts":https://classic.scraperwiki.com/scrapers/desert-island-disc-broadcasts/ & "Francis Irving / Desert Island Disc records":https://classic.scraperwiki.com/scrapers/python-desert-island-discs-records/)
