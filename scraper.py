@@ -179,7 +179,9 @@ def fetch_index_page(page_num):
 def main():
     index_html = scraperwiki.scrape(BASE).decode("utf-8")
     index = lxml.html.fromstring(index_html)
-    episode_count = int(index.cssselect('p#search-found span')[0].text_content().split(' ')[0])
+    # TODO: use attribute instead to make more reliable
+    #episode_count = int(index.cssselect('p#did-search-found').get('data-total'))
+    episode_count = int(index.cssselect('p#did-search-found span')[0].text_content().split(' ')[0])
     print '%d total episodes' % episode_count
     pages = index.cssselect('ul.pages li a')
     last_index_page = int(pages[-2].text_content())
