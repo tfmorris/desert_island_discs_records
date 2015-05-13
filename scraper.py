@@ -138,11 +138,11 @@ def process_guest(date, name, occupation, url):
     return True
 
 def process_index_page(pg):
-    items = pg.cssselect('div.search-item')
-    # print 'Index page has %d items' % len(items)
+    items = pg.cssselect('div.did-search-item')
+    print 'Index page has %d items' % len(items)
     count = 0
     for item in items:
-        text = item.cssselect('div.text')
+        text = item.cssselect('div.did-text')
         if not text:
             print 'Unable to process item - no text div'
             continue
@@ -154,19 +154,19 @@ def process_index_page(pg):
         guest = guest[0]
         guest_url = SITE + guest.attrib['href']
         guest_name = guest.text_content()
-        date = text.cssselect('p.date')
+        date = text.cssselect('div.broadcast-event__time')
         if not date:
             print 'Unable to find broadcast date for guest "%s"' % guest_name
             continue
-        date = date[0].text_content().split('|')[1].strip()
+        date = date[0].get('content').split('T')[0].strip()
         # Convert date to ISO format
-        date = datetime.strptime(date,'%d %b %Y').strftime('%Y-%m-%d')
-        occupation = text.cssselect('p')
-        if len(occupation) > 1:
-            occupation = occupation[1].text_content()
+        #date = datetime.strptime(date,'%d %b %Y').strftime('%Y-%m-%d')
+        occupation = text.cssselect('div.did-castaway-occupations div.did-content')
+        if len(occupation) > 0:
+            occupation = occupation[0].text_content()
         else:
             occupation = ''
-        #print date, guest_name, occupation, guest_url
+        print date, guest_name, occupation, guest_url
         if process_guest(date, guest_name, occupation, guest_url):
             count += 1
     print 'Processed %d of %d shows' % (count,len(items))
