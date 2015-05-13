@@ -13,7 +13,7 @@ SITE = 'http://www.bbc.co.uk'
 BASE = SITE + '/radio4/features/desert-island-discs/find-a-castaway'
 
 if scraperwiki.sqlite.show_tables():
-    past = [(i['date'],i['guest']) for i in scraperwiki.sqlite.select("* from swdata WHERE type == 'url'")]
+    past = [(i['date'],i['guest']) for i in scraperwiki.sqlite.select("* from data WHERE type == 'url'")]
 else:
     past = []
 print 'Database contains %d past entries' % len(past)
