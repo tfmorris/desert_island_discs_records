@@ -152,7 +152,7 @@ def process_index_page(pg):
             print 'Unabled to find guest name'
             continue
         guest = guest[0]
-        guest_url = SITE + guest.attrib['href']
+        guest_url = guest.attrib['href']
         guest_name = guest.text_content()
         date = text.cssselect('p.did-date')
         if not date:
