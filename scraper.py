@@ -154,14 +154,14 @@ def process_index_page(pg):
         guest = guest[0]
         guest_url = SITE + guest.attrib['href']
         guest_name = guest.text_content()
-        date = text.cssselect('div.broadcast-event__time')
+        date = text.cssselect('p.did-date')
         if not date:
             print 'Unable to find broadcast date for guest "%s"' % guest_name
             continue
-        date = date[0].get('content').split('T')[0].strip()
+        date = date[0].text_content().split('|')[1].strip()	
         # Convert date to ISO format
-        #date = datetime.strptime(date,'%d %b %Y').strftime('%Y-%m-%d')
-        occupation = text.cssselect('div.did-castaway-occupations div.did-content')
+        date = datetime.strptime(date,'%d %b %Y').strftime('%Y-%m-%d')
+        occupation = text.cssselect('p.did-castaways-known-for')
         if len(occupation) > 0:
             occupation = occupation[0].text_content()
         else:
