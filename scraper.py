@@ -6,7 +6,6 @@
 #  - restructured to run as a single integrated process and not rescrape data it already extracted
 
 import scraperwiki
-import scraperwiki.apiwrapper
 import lxml.html
 from datetime import datetime
 
