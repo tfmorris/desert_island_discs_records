@@ -11,6 +11,7 @@ from datetime import datetime
 
 SITE = 'http://www.bbc.co.uk'
 BASE = SITE + '/radio4/features/desert-island-discs/find-a-castaway'
+INDEX_PAGE_SIZE = 20
 
 if scraperwiki.sqlite.show_tables():
     past = [(i['date'],i['guest']) for i in scraperwiki.sqlite.select("* from data WHERE type == 'url'")]
@@ -183,9 +184,8 @@ def main():
     #episode_count = int(index.cssselect('p#did-search-found').get('data-total'))
     episode_count = int(index.cssselect('p#did-search-found span')[0].text_content().split(' ')[0])
     print '%d total episodes' % episode_count
-    pages = index.cssselect('ul.pages li a')
-    last_index_page = int(pages[-2].text_content())
-    print '%d index pages' % last_index_page
+    last_index_page = (episode_count + INDEX_PAGE_SIZE - 1) / INDEX_PAGE_SIZE
+    print 'Computed %d index pages' % last_index_page
     
     count = process_index_page(index) # handle the first page
     for page_num in range(2,last_index_page+1):
