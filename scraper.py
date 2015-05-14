@@ -1,9 +1,18 @@
-# Scrape BBC Desert Island Discs data including songs, books, and luxury item, if available, for the celebrity "castaways"
-# based on original work by Francis Irving with the following changes by Tom Morris July 2012:
+# Scrape BBC Desert Island Discs data including songs, books, and luxury item,
+# if available, for the celebrity "castaways".
+#
+# *based on original work by Francis Irving 
+# *July 2012 - rewritten by Tom Morris with the following changes:
 #  - updated to current BBC page format
 #  - switched from BeautifulSoup to lxml
 #  - updated deprecated database calls
-#  - restructured to run as a single integrated process and not rescrape data it already extracted
+#  - restructured to run as a single integrated process 
+#    and not rescrape data it already extracted
+# *May 2015 - ported to morph.io from dead ScraperWiki & updated to match
+#  current BBC web site layout
+#
+# TODO:
+# - get rid of dependency on scraperwiki package
 
 import scraperwiki
 import lxml.html
@@ -21,15 +30,16 @@ print 'Database contains %d past entries' % len(past)
 
 def process_guest(date, name, occupation, url):
     if (date,name) in past:
-        # print 'Skipping %s %s' % (date,name)
+        #print 'Skipping %s %s' % (date,name)
         return False
+
     html = scraperwiki.scrape(url).decode("utf-8")
     root = lxml.html.fromstring(html)
-    intro = root.cssselect('div#castaway_intro h1')
+    intro = root.cssselect('div.island div h1')
 
     # Check for unexpected page format
     if intro == None:
-        print "skipping, no <div id='castaway_intro'>, page format has changed? ",url
+        print 'skipping, no <div "class=island"><H1>, page format has changed? ',url
         return
 
     # Denormalized schema, but that's a little easier for consumers
@@ -57,44 +67,52 @@ def process_guest(date, name, occupation, url):
     # TODO It would be more efficient to only fetch the page once for all broadcasts, 
     # but we sacrifice a small amount of efficiency for the rare cast to better fit with our control flow
 
-    broadcast_id = url.split('#')[-1]
-    broadcast = root.cssselect('div#'+broadcast_id)
-    # The first broadcast doesn't appear to be tagged with an ID (even though the URL references it)
-    # so default to using the first broadcast that we find
-    if not broadcast:
-        #print 'Failed to find broadcast by ID.  Using default'
-        broadcast=root.cssselect('div.castaway-content')
-    broadcast = broadcast[0]
+    broadcast_id = url.split('/')[-1]
+    # TODO we used to handle multiple broadcasts per page, but
+    # not sure what the current structure is
 
-    # Track choices
-    for choice in broadcast.cssselect('div.castaway-choice'):
-        text = choice.cssselect('div.text')[0]
-        num = text.cssselect('p.number')[0].text_content()
-        #print lxml.html.tostring(text)
-        # Sanity check number?
-        keep = text.cssselect('p.track_keep') # Only present if it's their favorite track
-        artist = text.cssselect('h4')[0].text_content()
+    # NOTE: Without Javascript, records picks are on a separate page
+    seghtml = scraperwiki.scrape(url+'/segments').decode("utf-8")
+    segroot = lxml.html.fromstring(seghtml)
+
+    choices =  segroot.cssselect('li.segments-list__item--music')
+    if len(choices) != 8:
+        print 'Unexpected number of choices: ', len(choices)
+
+    for choice in choices:
+        text = choice.cssselect('div.segment__track')[0]
+
+        # TODO: Favorite is in separate group now
+        #keep = text.cssselect('p.track_keep') # Only present if it's their favorite track
+        keep = False
+        artist = text.cssselect('span.artist')
+        if artist:
+            artist = artist[0].text_content()
+        else:
+            artist = None
+            print 'Artist missing'
+
         # extract artist musicbrainz id if available
-        link = text.cssselect('h4 a') # need to parse link attribute url
+        link = text.cssselect('h3 a') # need to parse link attribute url
         if link:
             mb_id = link[0].attrib['href'].split('/')[-1]
         else:
             mb_id = None
-        track = text.cssselect('p.track_choice')[0].text_content()
-        composer = text.cssselect('p.composer')[0].text_content() # not necessarily the composer
+        track = text.cssselect('span[property="name"]')[0].text_content()
+        performers = text.cssselect('span[property="contributor"]')
 
         principal = 'artist'
-        if composer:
-            if composer.startswith('Composer: '):
-                composer = composer.split('Composer: ')[1]
-            else:
-                principal = 'composer'
-                tmp = composer
-                composer = artist
-                if tmp.startswith('Artist: '):
-                    artist = tmp.split('Artist: ')[1]
-                else:
-                    artist = tmp
+        composer = None
+        # TODO: If we have a <span[property="contributor"> elements which 
+        # are prefaced with "Performer: "
+        # it's probably a classical piece where the "artist" is the composer
+        if performers:
+            principal = 'composer'
+            composer = artist
+            artist = None
+            performer = performers[0]
+            if 'Performer:' in performer.text_content():
+                artist = performer.cssselect('span[property="name"]')[0].text_content()
 
         rec.update({'type': 'record_keep' if keep else 'record',
                     'title' : track,
@@ -112,21 +130,28 @@ def process_guest(date, name, occupation, url):
                 'mb_id' : None,
                  })
 
-    book = broadcast.cssselect('div.book-item')
-    if book:
-        title = book[0].cssselect('h5.book_choice')[0].text_content()
+    nonmusic = segroot.cssselect('li.segments-list__item--speech')
+    # DANGER - we assume fixed order for book & luxury item
+    # They're not semantically tagged
+    if len(nonmusic) > 0:
+        title = nonmusic[0].cssselect('p')[0].text_content()
         rec.update({'type': 'book',
                     'title' : title,
                     })
+        #print 'Book: ', title
         scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+    else:
+        print 'Book missing'
 
-    luxury = broadcast.cssselect('div.luxury-item')
-    if luxury:
-        item = luxury[0].cssselect('h5.luxury_item_choice')[0].text_content()
+    if len(nonmusic) > 1:
+        item = nonmusic[1].cssselect('p')[0].text_content()
         rec.update({'type': 'luxury',
                     'title' : item,
                     })
+        #print 'Luxury: ', item
         scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+    else:
+        print 'Luxury item missing'
 
     # URL record must be written last because it's the key we use to determine record is complete
     rec = {'date':date,
@@ -153,7 +178,7 @@ def process_index_page(pg):
             continue
         guest = guest[0]
         guest_url = guest.attrib['href']
-        guest_name = guest.text_content()
+        guest_name = guest.text_content().strip()
         date = text.cssselect('p.did-date')
         if not date:
             print 'Unable to find broadcast date for guest "%s"' % guest_name
@@ -183,6 +208,7 @@ def main():
     # TODO: use attribute instead to make more reliable
     #episode_count = int(index.cssselect('p#did-search-found').get('data-total'))
     episode_count = int(index.cssselect('p#did-search-found span')[0].text_content().split(' ')[0])
+    assert episode_count > 0
     print '%d total episodes' % episode_count
     last_index_page = (episode_count + INDEX_PAGE_SIZE - 1) / INDEX_PAGE_SIZE
     print 'Computed %d index pages' % last_index_page
