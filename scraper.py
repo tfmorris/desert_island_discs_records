@@ -118,8 +118,7 @@ def process_guest(date, name, occupation, url):
             artist = None
             performer = performers[0]
             if 'Performer:' in performer.text_content():
-                artist = performer.cssselect('span[property="name"]')[0].text_content()
-                artist = artist.split('Performer:')[1].strip()
+                artist = performer.cssselect('span[property="name"]')[0].text_content().strip()
 
         rec.update({'type': 'record_keep' if keep else 'record',
                     'title' : track,
@@ -198,7 +197,7 @@ def process_index_page(pg):
             occupation = occupation[0].text_content()
         else:
             occupation = ''
-        #print date, guest_name, occupation, guest_url
+        #print date, guest_name.encode('utf-8'), occupation, guest_url
         if process_guest(date, guest_name, occupation, guest_url):
             count += 1
     print 'Processed %d of %d shows' % (count,len(items))
