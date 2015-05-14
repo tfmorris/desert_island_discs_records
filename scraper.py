@@ -17,6 +17,7 @@
 import scraperwiki
 import lxml.html
 from datetime import datetime
+from urllib2 import HTTPError
 
 SITE = 'http://www.bbc.co.uk'
 BASE = SITE + '/radio4/features/desert-island-discs/find-a-castaway'
@@ -72,7 +73,12 @@ def process_guest(date, name, occupation, url):
     # not sure what the current structure is
 
     # NOTE: Without Javascript, records picks are on a separate page
-    seghtml = scraperwiki.scrape(url+'/segments').decode("utf-8")
+    try:
+        seghtml = scraperwiki.scrape(url+'/segments').decode("utf-8")
+    except HTTPError:
+        print 'Failed to fetch /segments for ', url
+        return False
+
     segroot = lxml.html.fromstring(seghtml)
 
     choices =  segroot.cssselect('li.segments-list__item--music')
