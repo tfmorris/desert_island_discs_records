@@ -16,6 +16,7 @@
 
 import scraperwiki
 import lxml.html
+from lxml import etree
 from datetime import datetime
 from urllib2 import HTTPError
 
@@ -216,7 +217,7 @@ def main():
     #episode_count = int(index.cssselect('p#did-search-found').get('data-total'))
     episode_count = int(index.cssselect('p#did-search-found span')[0].text_content().split(' ')[0])
     if episode_count <= 0:
-        print 'No episodes: ',index_html
+        print 'No episodes: ',etree.tostring(index)
     assert episode_count > 0
     print '%d total episodes' % episode_count
     last_index_page = (episode_count + INDEX_PAGE_SIZE - 1) / INDEX_PAGE_SIZE
