@@ -106,7 +106,6 @@ def process_guest(date, name, occupation, url):
         else:
             mb_id = None
         track = text.cssselect('span[property="name"]')[1].text_content().strip()
-        print track
         performers = text.cssselect('span[property="contributor"]')
 
         principal = 'artist'
