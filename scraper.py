@@ -97,7 +97,7 @@ def process_guest(date, name, occupation, url):
             artist = artist[0].text_content().strip()
         else:
             artist = None
-            print 'Artist missing'
+            print 'Artist missing for selection on: ', url + '/segments'
 
         # extract artist musicbrainz id if available
         link = text.cssselect('h3 a') # need to parse link attribute url
@@ -138,8 +138,10 @@ def process_guest(date, name, occupation, url):
                  })
 
     nonmusic = segroot.cssselect('li.segments-list__item--speech')
-    # DANGER - we assume fixed order for book & luxury item
-    # They're not semantically tagged
+    # DANGER - we assume fixed order for book & luxury item which will give
+    # wrong result if the book is missing or the order is changed
+    # They're not semantically tagged, but we could check the preceding <h3>
+    # for BOOK CHOICE or LUXURY CHOICE options
     if len(nonmusic) > 0:
         title = nonmusic[0].cssselect('p')[0].text_content()
         rec.update({'type': 'book',
@@ -148,7 +150,7 @@ def process_guest(date, name, occupation, url):
         #print 'Book: ', title
         scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
     else:
-        print 'Book missing'
+        print 'Book missing for: ', url
 
     if len(nonmusic) > 1:
         item = nonmusic[1].cssselect('p')[0].text_content()
@@ -158,7 +160,7 @@ def process_guest(date, name, occupation, url):
         #print 'Luxury: ', item
         scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
     else:
-        print 'Luxury item missing'
+        print 'Luxury item missing for: ', url
 
     # URL record must be written last because it's the key we use to determine record is complete
     rec = {'date_scraped' : datetime.now(),
