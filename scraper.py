@@ -160,7 +160,8 @@ def process_guest(date, name, occupation, url):
         print 'Luxury item missing'
 
     # URL record must be written last because it's the key we use to determine record is complete
-    rec = {'date':date,
+    rec = {'date_scraped' : datetime.now(),
+           'date':date,
            'guest':name,
            'type':'url',
            'title':url,
