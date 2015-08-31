@@ -98,11 +98,15 @@ def process_guest(date, name, occupation, url):
         #keep = text.cssselect('p.track_keep') # Only present if it's their favorite track
         keep = False
         artist = text.cssselect('span.artist')
+        names = text.cssselect('span[property="name"]')
         if artist:
             artist = artist[0].text_content().strip()
+            track = names[1].text_content().strip()
         else:
             artist = None
+            track = names[0].text_content().strip() # a guess for rare case
             print 'Artist missing for selection on: ', url + '/segments'
+            print 'Track: ', track, ' names: ', names
 
         # extract artist musicbrainz id if available
         link = text.cssselect('h3 a') # need to parse link attribute url
@@ -110,7 +114,7 @@ def process_guest(date, name, occupation, url):
             mb_id = link[0].attrib['href'].split('/')[-1]
         else:
             mb_id = None
-        track = text.cssselect('span[property="name"]')[1].text_content().strip()
+
         performers = text.cssselect('span[property="contributor"]')
 
         principal = 'artist'
