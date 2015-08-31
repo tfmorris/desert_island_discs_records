@@ -35,7 +35,12 @@ def process_guest(date, name, occupation, url):
         #print 'Skipping %s %s' % (date,name)
         return False
 
-    html = scraperwiki.scrape(url).decode("utf-8")
+    try:
+        html = scraperwiki.scrape(url).decode("utf-8")
+    except HTTPError as e:
+        print e
+        print 'Unable to fetch URL: ', url
+        return
     root = lxml.html.fromstring(html)
     intro = root.cssselect('div.island div h1')
 
