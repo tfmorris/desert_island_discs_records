@@ -184,7 +184,8 @@ def process_guest(date, name, occupation, url):
 
 def process_index_page(pg):
     items = pg.cssselect('div.did-search-item')
-    print 'Index page has %d items' % len(items)
+    if len(items) != 20:
+        print '**Index page has %d items, expected 20' % len(items)
     count = 0
     for item in items:
         text = item.cssselect('div.did-text')
