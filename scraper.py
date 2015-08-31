@@ -98,15 +98,16 @@ def process_guest(date, name, occupation, url):
         #keep = text.cssselect('p.track_keep') # Only present if it's their favorite track
         keep = False
         artist = text.cssselect('span.artist')
-        names = text.cssselect('span[property="name"]')
+        names = [n.text_content().strip() for n in text.cssselect('span[property="name"]')]
         if artist:
             artist = artist[0].text_content().strip()
-            track = names[1].text_content().strip()
+            track = names[1]
         else:
             artist = None
-            track = names[0].text_content().strip() # a guess for rare case
+            track = names[0] # a guess for rare case
             print 'Artist missing for selection on: ', url + '/segments'
-            print 'Track: ', track.encode('utf-8'), ' names: ', names
+            print 'Track: ', track.encode('utf-8')
+            print 'Names: ', [n.encode('utf-8') for n in names]
 
         # extract artist musicbrainz id if available
         link = text.cssselect('h3 a') # need to parse link attribute url
@@ -235,7 +236,7 @@ def main():
     print 'Computed %d index pages' % last_index_page
     
     count = process_index_page(index) # handle the first page
-    for page_num in range(2,last_index_page+1):
+    for page_num in range(34,last_index_page+1):
         page = fetch_index_page(page_num)
         count += process_index_page(page)
     print 'Processed %d new entries' % count
