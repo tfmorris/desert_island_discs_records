@@ -236,7 +236,7 @@ def main():
     print 'Computed %d index pages' % last_index_page
     
     count = process_index_page(index) # handle the first page
-    for page_num in range(34,last_index_page+1):
+    for page_num in range(2,last_index_page+1):
         page = fetch_index_page(page_num)
         count += process_index_page(page)
     print 'Processed %d new entries' % count
