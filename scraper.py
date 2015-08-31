@@ -106,7 +106,7 @@ def process_guest(date, name, occupation, url):
             artist = None
             track = names[0].text_content().strip() # a guess for rare case
             print 'Artist missing for selection on: ', url + '/segments'
-            print 'Track: ', track, ' names: ', names
+            print 'Track: ', track.encode('utf-8'), ' names: ', names
 
         # extract artist musicbrainz id if available
         link = text.cssselect('h3 a') # need to parse link attribute url
