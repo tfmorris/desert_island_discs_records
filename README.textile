@@ -1,4 +1,5 @@
 List of all picks from BBC radio's Desert Island Discs show 1942-present.
+http://www.bbc.co.uk/radio4/features/desert-island-discs/find-a-castaway
 
 Record types include:
 * url - link to BBC web page for the show
@@ -11,6 +12,9 @@ Record types include:
 
 Most of the column names should be self explanatory.  
 * MB_ID is the MusicBrainz ID for the composer or artist.
-* "principal" tells whether they main heading for the item, as specified by the BBC was the composer or performer (it varies).  The MusicBrainz ID also goes with this person.
+* "principal" tells whether the main heading for the item, as specified by the BBC was the composer or performer (it varies).  The MusicBrainz ID also goes with this person.
 
+Migrated from ScraperWiki when it was abandoned: "Tom Morris / BBC Desert Island Discs picks":https://classic.scraperwiki.com/scrapers/desert_island_discs_records/index.html
 Based on (and replaces) a pair of scrapers: "Francis Irving / Desert Island Disc broadcasts":https://classic.scraperwiki.com/scrapers/desert-island-disc-broadcasts/ & "Francis Irving / Desert Island Disc records":https://classic.scraperwiki.com/scrapers/python-desert-island-discs-records/)
+
+Database reset & completely refreshed 1 Sept 2015
