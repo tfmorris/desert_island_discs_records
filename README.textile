@@ -1,6 +1,9 @@
 List of all picks from BBC radio's Desert Island Discs show 1942-present.
 http://www.bbc.co.uk/radio4/features/desert-island-discs/find-a-castaway
 
+Scraper runs on morph.io where the data is available:
+https://morph.io/tfmorris/desert_island_discs_records
+
 Record types include:
 * url - link to BBC web page for the show
 * alternate_name - name on show page if it differs from index page
