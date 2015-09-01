@@ -31,9 +31,10 @@ else:
 print 'Database contains %d past entries' % len(past)
 
 def process_guest(date, name, occupation, url):
-    if (date,name) in past:
-        #print 'Skipping %s %s' % (date,name)
-        return False
+# TEMPORARY: Force rescan to pick up skipped books & luxury items
+#    if (date,name) in past:
+#        #print 'Skipping %s %s' % (date,name)
+#        return False
 
     try:
         html = scraperwiki.scrape(url).decode("utf-8")
@@ -105,9 +106,9 @@ def process_guest(date, name, occupation, url):
         else:
             artist = None
             track = names[0] # a guess for rare case
-            print 'Artist missing for selection on: ', url + '/segments'
-            print 'Track: ', track.encode('utf-8')
-            print 'Names: ', [n.encode('utf-8') for n in names]
+            #print 'Artist missing for selection on: ', url + '/segments'
+            #print 'Track: ', track.encode('utf-8')
+            #print 'Names: ', [n.encode('utf-8') for n in names]
 
         # extract artist musicbrainz id if available
         link = text.cssselect('h3 a') # need to parse link attribute url
@@ -153,22 +154,26 @@ def process_guest(date, name, occupation, url):
     # They're not semantically tagged, but we could check the preceding <h3>
     # for BOOK CHOICE or LUXURY CHOICE options
     if len(nonmusic) > 0:
-        title = nonmusic[0].cssselect('p')[0].text_content()
-        rec.update({'type': 'book',
-                    'title' : title,
-                    })
-        #print 'Book: ', title
-        scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+        title = nonmusic[0].cssselect('span.title')[0].text_content()
+        if title:
+            rec.update({'type': 'book',
+                        'title' : title,
+                       })
+            scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+        else:
+            print 'No book title for ', url
     else:
         print 'Book missing for: ', url
 
     if len(nonmusic) > 1:
-        item = nonmusic[1].cssselect('p')[0].text_content()
-        rec.update({'type': 'luxury',
-                    'title' : item,
-                    })
-        #print 'Luxury: ', item
-        scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+        item = nonmusic[1].cssselect('span.title')[0].text_content()
+        if item:
+            rec.update({'type': 'luxury',
+                        'title' : item,
+                        })
+            scraperwiki.sqlite.save(["date", "guest", "type", "title"], rec)
+        else:
+            print 'No luxury item for ', url
     else:
         print 'Luxury item missing for: ', url
 
