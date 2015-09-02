@@ -31,10 +31,9 @@ else:
 print 'Database contains %d past entries' % len(past)
 
 def process_guest(date, name, occupation, url):
-# TEMPORARY: Force rescan to pick up skipped books & luxury items
-#    if (date,name) in past:
-#        #print 'Skipping %s %s' % (date,name)
-#        return False
+    if (date,name) in past:
+        #print 'Skipping %s %s' % (date,name)
+        return False
 
     try:
         html = scraperwiki.scrape(url).decode("utf-8")
