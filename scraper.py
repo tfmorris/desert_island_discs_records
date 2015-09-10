@@ -45,7 +45,7 @@ def process_guest(date, name, occupation, url):
     intro = root.cssselect('div.island div h1')
 
     # Check for unexpected page format
-    if intro == None:
+    if intro == None or len(intro) == 0:
         print 'skipping, no <div "class=island"><H1>, page format has changed? ',url
         return
 
