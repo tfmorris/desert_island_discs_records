@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Scrape BBC Desert Island Discs data including songs, books, and luxury item,
 # if available, for the celebrity "castaways".
 #
@@ -21,7 +22,12 @@ from datetime import datetime
 from urllib2 import HTTPError
 
 SITE = 'http://www.bbc.co.uk'
-BASE = SITE + '/radio4/features/desert-island-discs/find-a-castaway'
+
+# FIXME - this code has not been updated to work with the new site introduced September, 2017
+
+raise NotImplementedError("BBC Radio 4 site changed format August 28, 2017 and this code has not yet been updated for new layout")
+
+BASE = SITE + '/programmes/b006qnmr/episodes/guide'
 INDEX_PAGE_SIZE = 20
 
 if scraperwiki.sqlite.show_tables():
@@ -228,7 +234,11 @@ def fetch_index_page(page_num):
     return lxml.html.fromstring(page_html)
         
 def main():
-    index_html = scraperwiki.scrape(BASE).decode("utf-8")
+    try:
+        index_html = scraperwiki.scrape(BASE).decode("utf-8")
+    except HTTPError as e:
+        print "Unabled to fetch " + BASE
+        raise e
     index = lxml.html.fromstring(index_html)
     # TODO: use attribute instead to make more reliable
     #episode_count = int(index.cssselect('p#did-search-found').get('data-total'))
