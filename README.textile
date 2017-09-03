@@ -1,5 +1,10 @@
-List of all picks from BBC radio's Desert Island Discs show 1942-present.
-http://www.bbc.co.uk/radio4/features/desert-island-discs/find-a-castaway
+h1. This scraper is currently BROKEN
+
+The BBC Radio 4 web site changed format on August 29, 2017 and this scraper has not been updated to deal with the new format yet. The last show scraped was August 8, 2017.
+
+h2. BBC Radio's Desert Island Discs show 1942-August 28, 2017.
+
+http://www.bbc.co.uk/programmes/b006qnmr/episodes/guide (was http://www.bbc.co.uk/radio4/features/desert-island-discs/find-a-castaway)
 
 Scraper runs on morph.io where the data is available:
 https://morph.io/tfmorris/desert_island_discs_records
