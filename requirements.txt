@@ -3,5 +3,5 @@
 -e git+http://github.com/openaustralia/scraperwiki-python.git@morph_defaults#egg=scraperwiki
 
 requests==2.20.0
-lxml==3.8.0
+lxml==4.6.5
 cssselect==1.0.1
